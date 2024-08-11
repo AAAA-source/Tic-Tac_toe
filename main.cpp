@@ -126,6 +126,22 @@ pair<int , int> choose( vector<vector<int> >* v )
             }
         }
     }
+    for(int j = 0 ; j < 3 ; j++) {
+        int count = 0 ;
+        for(int i = 0 ; i < 3 ; i++) {
+            if ( board[i][j] == 2 )
+                count++ ;
+            else if ( board[i][j] == 1 )
+                count-- ;
+        }
+        if ( count == 2 ){
+            for(int i = 0 ; i < 3 ; i++) {
+                if ( board[i][j] == 0 )
+                    return pair(i , j) ;
+            }
+        }
+    }
+    
     
     // not loose
     for(int i = 0 ; i < 3 ; i++) {
@@ -138,6 +154,22 @@ pair<int , int> choose( vector<vector<int> >* v )
         }
         if ( count == 2 ){
             for(int j = 0 ; j < 3 ; j++) {
+                if ( board[i][j] == 0 )
+                    return pair(i , j) ;
+            }
+        }
+    }
+    
+    for(int j = 0 ; j < 3 ; j++) {
+        int count = 0 ;
+        for(int i = 0 ; i < 3 ; i++) {
+            if ( board[i][j] == 1 )
+                count++ ;
+            else if ( board[i][j] == 2 )
+                count-- ;
+        }
+        if ( count == 2 ){
+            for(int i = 0 ; i < 3 ; i++) {
                 if ( board[i][j] == 0 )
                     return pair(i , j) ;
             }
@@ -175,6 +207,7 @@ void play_with_computer(void)
     while ( !win(&board) && !full(&board) ) {
         if ( !cursor ) {
             // player's turn
+            cout << "That's your turn" << endl ;
             int row , column ;
             cin >> row >> column ;
             while (  board[row - 1][column - 1] != 0 ) {
@@ -224,6 +257,7 @@ void print_message(void)
 {
     cout << "press 1 to start the game" << endl  ;
     cout << "press 2 to check the history" << endl  ;
+    cout << "press 3 to read the rules" << endl ;
     cout << "press -1 to closed the game" << endl ;
 }
 
@@ -240,6 +274,7 @@ int main(void)
                 if(!game())
                     cout << "Failed" << endl ;
                 break ;
+            
             
                 
             default :
