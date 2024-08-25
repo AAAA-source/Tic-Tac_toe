@@ -9,6 +9,12 @@ using std::endl ;
 using std::vector ;
 using std::pair ;
 
+vector< vector<pair<int , int>> > past_game_record ;
+
+void record( pair<int , int> now )
+{
+    past_game_record.back().push_back( now ) ;
+}
 
 
 void print_board( vector<vector<int> >* v )
@@ -77,6 +83,9 @@ void two_people_competition(void)
         }
         
         board[row - 1][column - 1] = now + 1 ;
+        
+        record( {row - 1 , column - 1} ) ;
+        
         print_board(&board) ;
         now = (now + 1) % 2 ;
     }
@@ -122,7 +131,7 @@ pair<int , int> choose( vector<vector<int> >* v )
         if ( count == 2 ){
             for(int j = 0 ; j < 3 ; j++) {
                 if ( board[i][j] == 0 )
-                    return pair(i , j) ;
+                    return pair<int , int>(i , j) ;
             }
         }
     }
@@ -137,7 +146,7 @@ pair<int , int> choose( vector<vector<int> >* v )
         if ( count == 2 ){
             for(int i = 0 ; i < 3 ; i++) {
                 if ( board[i][j] == 0 )
-                    return pair(i , j) ;
+                    return pair<int , int>(i , j) ;
             }
         }
     }
@@ -155,7 +164,7 @@ pair<int , int> choose( vector<vector<int> >* v )
         if ( count == 2 ){
             for(int j = 0 ; j < 3 ; j++) {
                 if ( board[i][j] == 0 )
-                    return pair(i , j) ;
+                    return pair<int , int>(i , j) ;
             }
         }
     }
@@ -171,7 +180,7 @@ pair<int , int> choose( vector<vector<int> >* v )
         if ( count == 2 ){
             for(int i = 0 ; i < 3 ; i++) {
                 if ( board[i][j] == 0 )
-                    return pair(i , j) ;
+                    return pair<int , int>(i , j) ;
             }
         }
     }
@@ -184,7 +193,7 @@ pair<int , int> choose( vector<vector<int> >* v )
             if ( board[i][j] == 1 )
                 continue ;
             if ( possible(i , j , &board , 1) + possible(i , j , &board , 2) > max ) {
-                candidate = pair(i , j) ;
+                candidate = pair<int , int>(i , j) ;
                 max = possible(i , j , &board , 1) + possible(i , j , &board , 2) ;
             }
         }
@@ -216,11 +225,14 @@ void play_with_computer(void)
             }
             
             board[row - 1][column - 1] = cursor + 1 ;
+            
+            record( {row - 1 , column - 1} ) ;
         }
         else {
             pair<int , int> result = choose(&board) ;
             board[result.first][result.second] = 2 ;
             
+            record( result ) ;
         }
         print_board(&board) ;
         cursor = !cursor ;
@@ -238,15 +250,17 @@ bool game(void)
     cout << "1 play with others" << endl ;
     cout << "2 play with computer" << endl ;
     
+    
     int choice ;
     cin >> choice ;
     if ( choice == 1 ) {
+        past_game_record.push_back({}) ;
         two_people_competition() ;
-
     }
     else {
         if ( choice != 2 )
             return false ;
+        past_game_record.push_back({}) ;
         play_with_computer() ;
     }
     
@@ -259,6 +273,59 @@ void print_message(void)
     cout << "press 2 to check the history" << endl  ;
     cout << "press 3 to read the rules" << endl ;
     cout << "press -1 to closed the game" << endl ;
+}
+
+bool print_record(void)
+{
+    cout << "Review" << endl ;
+    
+    if ( past_game_record.empty() ) {
+        cout << "no record" << endl ;
+        return 0 ;
+    }
+    
+    
+    decltype(past_game_record.size()) index = past_game_record.size() - 1 ;
+    
+    
+    bool finished = false ;
+    while ( !finished ) {
+        cout << "index : " << index << endl ;
+        if ( index != past_game_record.size() - 1 )
+            cout << "next game? (please input next)" << endl ;
+        if ( index != 0 )
+            cout << "last game? (please input last)" << endl ;
+        cout << "this game? (please input this)" << endl ;
+        
+        string s ;
+        cin >> s ;
+        
+        if ( s == "last" ) {
+            index-- ;
+        }
+        else if ( s == "next" ) {
+            index++ ;
+        }
+        else if ( s == "this" ) {
+            bool now = 0 ;
+            vector<vector<int>> board(3 , vector<int>(3)) ;
+            for( auto &i : past_game_record[index] ) {
+                board[ i.first ][ i.second ] = now + 1 ;
+                
+                print_board(&board) ;
+                
+                now = !now ;
+            }
+            finished = true ;
+        }
+        else {
+            cout << "Wrong input " << endl ;
+            break ;
+        }
+        
+    }
+    
+    return finished ;
 }
 
 int main(void)
@@ -274,7 +341,9 @@ int main(void)
                 if(!game())
                     cout << "Failed" << endl ;
                 break ;
-            
+            case 2 :
+                print_record() ;
+                break ;
             
                 
             default :
