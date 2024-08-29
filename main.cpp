@@ -1,6 +1,7 @@
 #include<iostream>
 #include<vector>
 #include<string>
+#include<fstream>
 
 using std::cin ;
 using std::cout ;
@@ -17,9 +18,8 @@ void record( pair<int , int> now )
 }
 
 
-void print_board( vector<vector<int> >* v )
+void print_board( vector<vector<int> >board )
 {
-    vector< vector<int> > &board = *v ;
     cout << "   1  2  3" << endl ;
     cout << endl ;
     for(int i = 0 ; i < 3 ; i++) {
@@ -35,9 +35,8 @@ void print_board( vector<vector<int> >* v )
     return ;
 }
 
-int win( vector<vector<int> >* v )
+int win( vector<vector<int> >& board )
 {
-    vector< vector<int> > &board = *v ;
     for(int i = 0 ; i < 3 ; ++i) {
         if ( board[i][0] == board[i][1] && board[i][1] == board[i][2] && board[i][0] != 0 )
             return board[i][0] ;
@@ -53,9 +52,8 @@ int win( vector<vector<int> >* v )
     return 0 ;
 }
 
-bool full( vector<vector<int> >* v )
+bool full( vector<vector<int> >& board )
 {
-    vector< vector<int> > &board = *v ;
     for(int i = 0 ; i < 3 ; i++) {
         for(int j = 0 ; j < 3 ; j++)
             if ( board[i][j] == 0 )
@@ -71,8 +69,8 @@ void two_people_competition(void)
     // 1 mean the front hand
     // 2 mean the back hand
     int now = 0 ;
-    print_board(&board) ;
-    while ( !win(&board) && !full(&board) ) {
+    print_board(board) ;
+    while ( !win(board) && !full(board) ) {
         cout << "Player " << now + 1 << " 's turn!" << endl ;
         
         int row , column ;
@@ -86,12 +84,12 @@ void two_people_competition(void)
         
         record( {row - 1 , column - 1} ) ;
         
-        print_board(&board) ;
+        print_board(board) ;
         now = (now + 1) % 2 ;
     }
     
-    if ( win(&board) )
-        cout << "Player " << win(&board) << " win the game " << endl ;
+    if ( win(board) )
+        cout << "Player " << win(board) << " win the game " << endl ;
     else
         cout << "Draw" << endl ;
     
@@ -212,8 +210,8 @@ void play_with_computer(void)
     bool cursor = (s == "Y")? 0 : 1 ;
     
     vector< vector<int> > board (3 , vector<int>(3) ) ;
-    print_board(&board) ;
-    while ( !win(&board) && !full(&board) ) {
+    print_board(board) ;
+    while ( !win(board) && !full(board) ) {
         if ( !cursor ) {
             // player's turn
             cout << "That's your turn" << endl ;
@@ -234,12 +232,12 @@ void play_with_computer(void)
             
             record( result ) ;
         }
-        print_board(&board) ;
+        print_board(board) ;
         cursor = !cursor ;
     }
     
-    if ( win(&board) )
-        cout << ( (win(&board) == 1)? "You" : "Computer" ) << " win " << endl ;
+    if ( win(board) )
+        cout << ( (win(board) == 1)? "You" : "Computer" ) << " win " << endl ;
     else
         cout << "Draw" << endl ;
     
@@ -312,7 +310,7 @@ bool print_record(void)
             for( auto &i : past_game_record[index] ) {
                 board[ i.first ][ i.second ] = now + 1 ;
                 
-                print_board(&board) ;
+                print_board(board) ;
                 
                 now = !now ;
             }
@@ -327,6 +325,27 @@ bool print_record(void)
     
     return finished ;
 }
+
+bool print_rule(void)
+{
+    std::ifstream file("rules.txt");
+    
+    if ( !file ) {
+        cout << "Failed" << endl ;
+        return false  ;
+    }
+    
+    string line ;
+    while ( std::getline(file , line) ) {
+        cout << line << endl ;
+    }
+    
+    
+    file.close() ;
+    return true ;
+}
+
+
 
 int main(void)
 {
@@ -343,6 +362,11 @@ int main(void)
                 break ;
             case 2 :
                 print_record() ;
+                break ;
+            case 3 :
+                if ( !print_rule() ) {
+                    cout << "file failed " << endl ;
+                }
                 break ;
             
                 
